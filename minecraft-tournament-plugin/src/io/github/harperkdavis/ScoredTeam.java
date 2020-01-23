@@ -4,16 +4,16 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Team;
 
-public class STeam {
+public class ScoredTeam {
 
     public Team team;
     public String teamName;
     public ChatColor col;
-    public SPlayer player1;
-    public SPlayer player2;
+    public ScoredPlayer player1;
+    public ScoredPlayer player2;
     public int score = 0;
 
-    STeam(String teamName, ChatColor col, SPlayer c) {
+    ScoredTeam(String teamName, ChatColor col, ScoredPlayer c) {
         this.teamName = teamName;
         this.col = col;
         player1 = c;

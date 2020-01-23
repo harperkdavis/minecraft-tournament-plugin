@@ -2,14 +2,14 @@ package io.github.harperkdavis;
 
 import org.bukkit.entity.Player;
 
-public class SPlayer {
+public class ScoredPlayer {
 
     public Player player;
-    public STeam team;
+    public ScoredTeam team;
     public int score;
     public Boolean admin;
 
-    SPlayer (Player player, Boolean admin) {
+    ScoredPlayer (Player player, Boolean admin) {
         this.player = player;
         this.admin = admin;
 

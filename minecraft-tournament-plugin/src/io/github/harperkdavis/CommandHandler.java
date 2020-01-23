@@ -46,10 +46,10 @@ public class CommandHandler implements CommandExecutor {
             } else if (args.length == 1) {
                 if (args[0].equals("team")) { // team add person
                     player.sendMessage(ChatColor.LIGHT_PURPLE + "Team Schtuff");
-                    if (main.getSPlayer(player).team == null) { // no team
+                    if (main.getScoredPlayer(player).team == null) { // no team
                         player.sendMessage(ChatColor.RED + "You are not on a team. Create a team with /mct team create <name>");
                     } else { // on team (make info)
-                        main.getSPlayer(player).team.sendInfo(player);
+                        main.getScoredPlayer(player).team.sendInfo(player);
                     }
                 }
             } else if (args.length == 2) {
@@ -64,7 +64,7 @@ public class CommandHandler implements CommandExecutor {
             } else if (args.length == 3) {
                 if (args[0] == "team") { // team
                     if (args[1] == "create") { // create team
-                        STeam team = new STeam(args[2], randomChatColor(), main.getSPlayer(player));
+                        ScoredTeam team = new ScoredTeam(args[2], randomChatColor(), main.getScoredPlayer(player));
                         Bukkit.getServer().broadcastMessage(ChatColor.BLUE + player.getDisplayName() + ChatColor.WHITE + " has created the team: " + team.col + team.teamName);
                     }
                 }

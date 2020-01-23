@@ -15,8 +15,8 @@ import java.util.List;
 
 public class MCTMain extends JavaPlugin implements Listener {
 
-    public List<SPlayer> playerList;
-    public List<STeam> teamList;
+    public List<ScoredPlayer> playerList;
+    public List<ScoredTeam> teamList;
 
     public void onEnable() {
         loadConfig();
@@ -24,7 +24,7 @@ public class MCTMain extends JavaPlugin implements Listener {
         Bukkit.getServer().getPluginManager().registerEvents(this,this);
 
         for (Player p: Bukkit.getOnlinePlayers()) {
-            SPlayer player = new SPlayer(p, (p.getDisplayName().equals("not_fyyre")));
+            ScoredPlayer player = new ScoredPlayer(p, (p.getDisplayName().equals("not_fyyre")));
 
             if(!playerList.contains(player))
                 playerList.add(player);
@@ -51,15 +51,15 @@ public class MCTMain extends JavaPlugin implements Listener {
 
         Bukkit.getServer().broadcastMessage(ChatColor.DARK_GRAY+ "Watch out, an Admin is approaching!");
 
-        SPlayer player = new SPlayer(event.getPlayer(), isAdmin);
+        ScoredPlayer player = new ScoredPlayer(event.getPlayer(), isAdmin);
 
         if(!playerList.contains(player))
             playerList.add(player);
     }
 
-    public SPlayer getSPlayer(Player d) {
+    public ScoredPlayer getScoredPlayer(Player d) {
         Bukkit.getServer().broadcastMessage(ChatColor.GOLD + "Searching through players");
-        for (SPlayer p : playerList) {
+        for (ScoredPlayer p : playerList) {
             Bukkit.getServer().broadcastMessage(ChatColor.GRAY + "P: " + p);
             if (p.player == d) {
                 return p;
