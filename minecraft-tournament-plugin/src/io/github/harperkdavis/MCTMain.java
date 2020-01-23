@@ -47,7 +47,8 @@ public class MCTMain extends JavaPlugin implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         event.setJoinMessage(ChatColor.RED + event.getPlayer().getDisplayName() + ChatColor.GRAY + " has joined the Tournament");
 
-        Boolean isAdmin = event.getPlayer().getDisplayName() == "not_fyyre";
+        displayName = event.getPlayer().getDisplayName();
+        Boolean isAdmin = displayName == "not_fyyre" | displayName == "DatMrMe";
 
         Bukkit.getServer().broadcastMessage(ChatColor.DARK_GRAY+ "Watch out, an Admin is approaching!");
 
