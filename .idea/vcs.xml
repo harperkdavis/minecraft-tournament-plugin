@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/minecraft-tournament-plugin/Multiverse-Core" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/minecraft-tournament-plugin/src/Multiverse-Core" vcs="Git" />
+  </component>
+</project>

@@ -1,0 +1,87 @@
+
+HungerGames:
+  Tables:
+    Tier1:
+      - APPLE
+      - LEATHER_BOOTS
+      - LEATHER_HELMET
+      - LEATHER_LEGGINGS
+      - CHAINMAIL_BOOTS
+      - STRING
+      - STICK
+      - COOKED_BEEF
+      - COOKED_CHICKEN
+      - BREAD
+      - WOOD_SWORD
+      - RAW_FISH
+      - COAL
+      - STONE_AXE
+      - WOOD
+      - FLINT
+      - FEATHER
+      - LEATHER
+      - PAPER
+    Tier2:
+      - STONE_SWORD
+      - STONE_AXE
+      - IRON_AXE
+      - IRON_INGOT
+      - STRING
+      - LEATHER_CHESTPLATE
+      - IRON_BOOTS
+      - CHAINMAIL_CHESTPLATE
+      - CHAINMAIL_HELMET
+      - CHAINMAIL_LEGGINGS
+      - CHAINMAIL_BOOTS
+      - GOLD_INGOT
+      - WOOD
+      - STICK
+      - EXP_BOTTLE
+      - APPLE
+      - BREAD
+      - GOLDEN_CARROT
+      - COAL
+      - ARROW
+      - LEATHER
+      - PAPER
+      - IRON_HELMET
+      - FIREWORK
+    Tier3:
+      - DIAMOND
+      - IRON_INGOT
+      - GOLD_INGOT
+      - GOLDEN_APPLE
+      - BOW
+      - EXP_BOTTLE
+      - ARROW
+      - GOLDEN_CARROT
+      - FISHING_ROD
+      - LEATHER
+      - IRON_SWORD
+      - IRON_CHESTPLATE
+      - IRON_HELMET
+      - IRON_LEGGINGS
+      - IRON_BOOTS
+    Mid:
+      - STONE_SWORD
+      - GOLDEN_APPLE
+      - IRON_INGOT
+      - CHAINMAIL_HELMET
+      - CHAINMAIL_CHESTPLATE
+      - CHAINMAIL_LEGGINGS
+      - CHAINMAIL_BOOTS
+      - ARROW
+      - EXP_BOTTLE
+      - GOLD_INGOT
+      - BREAD
+      - GOLDEN_CARROT
+      - COOKED_BEEF
+      - COOKED_CHICKEN
+      - FLINT
+      - STICK
+      - FEATHER
+      - APPLE
+      - LEATHER_BOOTS
+      - LEATHER_HELMET
+      - LEATHER_LEGGINGS
+      - LEATHER_CHESTPLATE
