@@ -35,17 +35,12 @@ public class CommandHandler implements CommandExecutor {
 
             Player player = (Player)sender;
 
-            player.sendMessage(ChatColor.BLUE + player.getDisplayName() + ChatColor.WHITE + " has run the command with args: " + ChatColor.BOLD + String.valueOf(args.length));
-            for (int i = 0; i < args.length ; i ++) {
-                String arg = args[i];
-                player.sendMessage(ChatColor.GREEN + "args["+i+"]: " + ChatColor.WHITE + args[i]);
-            }
+            // player.sendMessage(ChatColor.BLUE + player.getDisplayName() + ChatColor.WHITE + " has run the command with args: " + ChatColor.BOLD + String.valueOf(args.length));
 
             if (args.length == 0) {
                 displayHelp(sender);
             } else if (args.length == 1) {
                 if (args[0].equals("team")) { // team add person
-                    player.sendMessage(ChatColor.LIGHT_PURPLE + "Team Schtuff");
                     if (main.getScoredPlayer(player).team == null) { // no team
                         player.sendMessage(ChatColor.RED + "You are not on a team. Create a team with /mct team create <name>");
                     } else { // on team (make info)
@@ -53,19 +48,53 @@ public class CommandHandler implements CommandExecutor {
                     }
                 }
             } else if (args.length == 2) {
-                if (args[0] == "start") {
-                    if(args[1] == "sg") { //start survival games
-                        generateChestLoot(sender);
-                        BukkitTask task = new HungerGames(main, Bukkit.getServer().getWorld("sg_map")).runTaskTimer(main, 5, 2);
+                if (args[0].equals("start")) {
+                    if(args[1].equals("sg")) { //start survival games
+                        player.sendMessage(ChatColor.WHITE + "Starting survival games!");
+                        BukkitTask task = new HungerGames(main, player).runTaskTimer(main, 5, 2);
                     }
-                } else {
-
+                } else if (args[0].equals("team")) {
+                    if (args[1].equals("leave")) {
+                        if (main.getScoredPlayer(player).team == null) {
+                            player.sendMessage(ChatColor.RED + "You are not on a team. Create a team with /mct team create <name>");
+                        } else {
+                            ScoredTeam t = main.getScoredPlayer(player).team;
+                            main.teamList.remove(t);
+                            player.sendMessage(ChatColor.WHITE + "You have disbanded the team");
+                            t.player2.player.sendMessage(ChatColor.BLUE + player.getName() + ChatColor.WHITE + " has disbanded the team");
+                            if(t.player1 != null) {
+                                t.player1.team = null;
+                                t.player1.player.setDisplayName(t.player1.player.getName());
+                            }
+                            if(t.player2 != null) {
+                                t.player2.team = null;
+                                t.player2.player.setDisplayName(t.player2.player.getName());
+                            }
+                        }
+                    }
                 }
             } else if (args.length == 3) {
-                if (args[0] == "team") { // team
-                    if (args[1] == "create") { // create team
-                        ScoredTeam team = new ScoredTeam(args[2], randomChatColor(), main.getScoredPlayer(player));
-                        Bukkit.getServer().broadcastMessage(ChatColor.BLUE + player.getDisplayName() + ChatColor.WHITE + " has created the team: " + team.col + team.teamName);
+                if (args[0].equals("team")) { // team
+                    if (args[1].equals("create")) { // create team
+                        if (main.getScoredPlayer(player).team == null) {
+                            ScoredTeam team = new ScoredTeam(args[2], randomChatColor(), main.getScoredPlayer(player));
+                            main.teamList.add(team);
+                            Bukkit.getServer().broadcastMessage(ChatColor.BLUE + player.getDisplayName() + ChatColor.WHITE + " has created the team: " + team.col + team.teamName);
+                        } else {
+                            player.sendMessage(ChatColor.RED + "You are already on a team! Leave with /mct team leave");
+                        }
+                    } else if (args[1].equals("add")) {
+                        if (main.getScoredPlayer(player).team != null) {
+                            Player p = Bukkit.getServer().getPlayer(args[2]);
+                            if (p != null) {
+                                main.getScoredPlayer(player).team.setPlayer2(main.getScoredPlayer(p));
+                                p.sendMessage(ChatColor.GOLD + "You have been added to " + main.getScoredPlayer(player).team.col + main.getScoredPlayer(player).team.teamName);
+                            } else {
+                                player.sendMessage(ChatColor.RED + "That player was not found!");
+                            }
+                        }  else {
+                            player.sendMessage(ChatColor.RED + "You are not on a team!");
+                        }
                     }
                 }
             }
@@ -114,120 +143,5 @@ public class CommandHandler implements CommandExecutor {
         sender.sendMessage(ChatColor.WHITE+ "/mct start <game> - start game");
     }
 
-    public void generateChestLoot(CommandSender sender) {
 
-        Bukkit.getServer().broadcastMessage(ChatColor.BLUE+"Generating Chests...");
-
-        List<String> tier1Loot = main.getConfig().getConfigurationSection("HungerGames").getConfigurationSection("Tables").getStringList("Tier1");
-        List<String> tier2Loot = main.getConfig().getConfigurationSection("HungerGames").getConfigurationSection("Tables").getStringList("Tier2");
-        List<String> tier3Loot = main.getConfig().getConfigurationSection("HungerGames").getConfigurationSection("Tables").getStringList("Tier3");
-        List<String> midLoot = main.getConfig().getConfigurationSection("HungerGames").getConfigurationSection("Tables").getStringList("Mid");
-
-        //Bukkit.getServer().broadcastMessage(ChatColor.BLUE+"Loaded Loot Tables:");
-
-
-        if(sender instanceof Player) {
-            Player player = (Player) sender;
-            //Bukkit.getServer().broadcastMessage(ChatColor.GRAY+player.getName());
-
-            int t1c = 0;
-            int t2c = 0;
-            int t3c = 0;
-
-            for(int x = -15; x <= 15; x++) {
-                for(int z = -15; z <= 15; z++) {
-
-                    Chunk c = player.getWorld().getChunkAt(x,z);
-
-                    String chp = ("Loaded Chunk: "+ c.getX()+","+c.getZ());
-                    //Bukkit.getServer().broadcastMessage(ChatColor.GRAY+chp);
-
-                    for (BlockState b : c.getTileEntities()) {
-
-                        if (b instanceof Chest) {
-                            Chest chest = (Chest) b;
-
-                            Inventory inv = chest.getInventory();
-
-                            inv.clear();
-
-                            List<String> lootTable;
-
-                            String chsp = ("Found A Chest At: "+ chest.getX()+","+chest.getY()+","+chest.getZ());
-                            //Bukkit.getServer().broadcastMessage(ChatColor.GOLD+chsp);
-
-                            String lt = ("This Chest's Name is: " + inv.getTitle());
-
-                            //Bukkit.getServer().broadcastMessage(ChatColor.AQUA+lt);
-
-                            double chanceSpawn;
-
-                            switch (inv.getTitle()) {
-                                case "Tier 1":
-                                    lootTable = tier1Loot;
-                                    chanceSpawn = 0.2;
-                                    t1c++;
-                                    break;
-                                case "Tier 2":
-                                    lootTable = tier2Loot;
-                                    chanceSpawn = 0.2;
-                                    t2c++;
-                                    break;
-                                case "Tier 3":
-                                    lootTable = tier3Loot;
-                                    chanceSpawn = 0.11;
-                                    t3c++;
-                                    break;
-                                case "Mid Chest":
-                                    lootTable = midLoot;
-                                    chanceSpawn = 0.15;
-                                    break;
-                                default:
-                                    lootTable = tier1Loot;
-                                    chanceSpawn = 0;
-                                    break;
-                            }
-
-
-                            for (int i = 0; i < 27; i++) {
-
-                                int index = new Random().nextInt(lootTable.size());
-                                String items = lootTable.get(index);
-
-                                if(Material.getMaterial(items.toUpperCase()) == null) {
-                                    //Bukkit.getServer().broadcastMessage(ChatColor.BLUE+"The Culprit is: " + items);
-                                }
-
-                                ItemStack newItem;
-
-                                if(Material.getMaterial(items.toUpperCase()) == Material.ARROW || Material.getMaterial(items.toUpperCase()) == Material.COAL) {
-                                    newItem = new ItemStack(Material.getMaterial(items.toUpperCase()), 4);
-                                } else if (Material.getMaterial(items.toUpperCase()) == Material.EXP_BOTTLE){
-                                    newItem = new ItemStack(Material.getMaterial(items.toUpperCase()), 16);
-                                } else {
-                                    newItem = new ItemStack(Material.getMaterial(items.toUpperCase()));
-                                }
-
-                                if (Math.random() < chanceSpawn) {
-                                    chest.getInventory().setItem(i, newItem);
-                                } else {
-                                    chest.getInventory().setItem(i, new ItemStack(Material.AIR, 1));
-                                }
-
-                            }
-                        }
-                    }
-                }
-            }
-
-            //completed
-            Bukkit.getServer().broadcastMessage(ChatColor.BLUE+"Finished Generating Chests!");
-            Bukkit.getServer().broadcastMessage(ChatColor.DARK_PURPLE+"Tier 1: "+ChatColor.WHITE + ChatColor.BOLD + t1c);
-            Bukkit.getServer().broadcastMessage(ChatColor.DARK_PURPLE+"Tier 2: "+ChatColor.WHITE + ChatColor.BOLD + t2c);
-            Bukkit.getServer().broadcastMessage(ChatColor.DARK_PURPLE+"Tier 3: "+ChatColor.WHITE + ChatColor.BOLD + t3c);
-        }
-
-
-
-    }
 }

@@ -1,4 +1,3 @@
-
 HungerGames:
   Tables:
     Tier1:
@@ -85,3 +84,20 @@ HungerGames:
       - LEATHER_HELMET
       - LEATHER_LEGGINGS
       - LEATHER_CHESTPLATE
+    Airdrop:
+      - IRON_HELMET
+      - IRON_CHESTPLATE
+      - IRON_LEGGINGS
+      - IRON_BOOTS
+      - DIAMOND_BOOTS
+      - DIAMOND_HELMET
+      - DIAMOND
+      - DIAMOND_SWORD
+      - GOLDEN_CARROT
+      - GOLDEN_APPLE
+      - DIAMOND_AXE
+      - GOLD_BLOCK
+      - IRON_BLOCK
+      - EXP_BOTTLE
+      - BOW
+      - ARROW

@@ -5,12 +5,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 
 
-public class Scoreboard extends BukkitRunnable {
+public class LobbyScoreboard extends BukkitRunnable {
 
     private final MCTMain main;
 
 
-    public Scoreboard(MCTMain main) {
+    public LobbyScoreboard(MCTMain main) {
         this.main = main;
     }
 
