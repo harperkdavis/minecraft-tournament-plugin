@@ -1,4 +1,3 @@
-
 HungerGames:
   Tables:
     Tier1:
@@ -7,6 +6,9 @@ HungerGames:
       - LEATHER_HELMET
       - LEATHER_LEGGINGS
       - CHAINMAIL_BOOTS
+      - GOLD_BOOTS
+      - GOLD_HELMET
+      - GOLD_SWORD
       - STRING
       - STICK
       - COOKED_BEEF
@@ -21,8 +23,10 @@ HungerGames:
       - FEATHER
       - LEATHER
       - PAPER
+      - GOLD_SWORD
     Tier2:
       - STONE_SWORD
+      - WOOD_SWORD
       - STONE_AXE
       - IRON_AXE
       - IRON_INGOT
@@ -33,8 +37,11 @@ HungerGames:
       - CHAINMAIL_HELMET
       - CHAINMAIL_LEGGINGS
       - CHAINMAIL_BOOTS
+      - GOLD_CHESTPLATE
+      - GOLD_HELMET
+      - GOLD_LEGGINGS
+      - GOLD_BOOTS
       - GOLD_INGOT
-      - WOOD
       - STICK
       - EXP_BOTTLE
       - APPLE
@@ -85,3 +92,20 @@ HungerGames:
       - LEATHER_HELMET
       - LEATHER_LEGGINGS
       - LEATHER_CHESTPLATE
+    Airdrop:
+      - IRON_HELMET
+      - IRON_CHESTPLATE
+      - IRON_LEGGINGS
+      - IRON_BOOTS
+      - DIAMOND_BOOTS
+      - DIAMOND_HELMET
+      - DIAMOND
+      - DIAMOND_SWORD
+      - GOLDEN_CARROT
+      - GOLDEN_APPLE
+      - DIAMOND_AXE
+      - GOLD_BLOCK
+      - IRON_BLOCK
+      - EXP_BOTTLE
+      - BOW
+      - ARROW
