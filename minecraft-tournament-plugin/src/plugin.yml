@@ -3,7 +3,6 @@ name: minecraft-tournament
 author: Harper Davis
 description: None
 version: 0.1.2
-
 commands:
   mct:
     description: The main minecraft tournament command

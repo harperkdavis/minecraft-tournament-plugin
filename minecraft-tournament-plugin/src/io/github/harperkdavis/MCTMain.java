@@ -1,15 +1,16 @@
 package io.github.harperkdavis;
 
-import net.minecraft.server.v1_8_R1.*;
+import net.minecraft.server.v1_8_R1.ChatSerializer;
+import net.minecraft.server.v1_8_R1.EnumTitleAction;
+import net.minecraft.server.v1_8_R1.IChatBaseComponent;
+import net.minecraft.server.v1_8_R1.PacketPlayOutTitle;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_8_R1.entity.CraftPlayer;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -17,15 +18,18 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.Team;
 
 import javax.xml.bind.Marshaller;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class MCTMain extends JavaPlugin implements Listener {
 
@@ -36,6 +40,8 @@ public class MCTMain extends JavaPlugin implements Listener {
 
     Boolean allowBlockPlacing = false;
 
+    private List<String> deathMessages;
+
     public void onEnable() {
         loadConfig();
         this.getCommand("mct").setExecutor(new CommandHandler(this));
@@ -43,8 +49,12 @@ public class MCTMain extends JavaPlugin implements Listener {
 
         // Bukkit.getServer().getConsoleSender().sendMessage("Players in list:"+playerList.size());
 
+        deathMessages = getConfig().getStringList("DeathMessages");
+        BukkitTask task = new LobbyScoreboard(this).runTaskTimer(this, 0, 2);
+        //tasksRunning.add(task);
+
         for (Player p: Bukkit.getOnlinePlayers()) {
-            ScoredPlayer player = new ScoredPlayer(p, (p.getDisplayName().equals("not_fyyre")));
+            ScoredPlayer player = new ScoredPlayer(p, (p.isOp()));
 
             if(!playerList.contains(player))
                 playerList.add(player);
@@ -64,11 +74,13 @@ public class MCTMain extends JavaPlugin implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         event.setJoinMessage(ChatColor.RED + event.getPlayer().getDisplayName() + ChatColor.GRAY + " has joined the Tournament");
 
-        Boolean isAdmin = false; //event.getPlayer().getName() == "not_fyyre";
+        Boolean isAdmin = event.getPlayer().isOp(); //event.getPlayer().getName() == "not_fyyre";
 
         if (isAdmin) {
             Bukkit.getServer().broadcastMessage(ChatColor.DARK_GRAY + "Watch out, an Admin is approaching!");
+            event.getPlayer().setWalkSpeed(0.2f);
         }
+
 
         ScoredPlayer player = new ScoredPlayer(event.getPlayer(), isAdmin);
 
@@ -117,8 +129,9 @@ public class MCTMain extends JavaPlugin implements Listener {
 
         killer.getWorld().strikeLightningEffect(killer.getLocation());
 
+        String message = deathMessages.get((int)Math.floor(Math.random() * deathMessages.size()));
 
-        e.setDeathMessage(ChatColor.RED + killed.getName() + " has been slain by " + killer.getName() + ChatColor.GRAY + " (" + ChatColor.YELLOW + killer.getHealth() + ChatColor.RED + "❤" + ChatColor.GRAY + ")");
+        e.setDeathMessage(ChatColor.RED + killed.getName() + " " + message + " " + killer.getName() + ChatColor.GRAY + " (" + ChatColor.YELLOW + killer.getHealth() + ChatColor.RED + "❤" + ChatColor.GRAY + ")");
 
 
         for (BukkitRunnable r : tasksRunning) {
@@ -169,6 +182,22 @@ public class MCTMain extends JavaPlugin implements Listener {
         }
 
         return sp;
+    }
+
+    public void ChangeWorldEvent(PlayerChangedWorldEvent event) {
+
+        Player player = (Player) event.getPlayer();
+        World world = player.getWorld();
+
+        if ((world.getName().equals("world"))){
+            for (BukkitRunnable r : tasksRunning) {
+                if (r instanceof HungerGames) {
+                    LobbyScoreboard ls = (LobbyScoreboard) r;
+                    ls.setScoreBoard(player);
+                }
+            }
+        }
+
     }
 
 }

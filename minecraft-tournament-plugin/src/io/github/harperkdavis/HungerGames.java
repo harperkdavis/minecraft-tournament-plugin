@@ -21,11 +21,9 @@ public class HungerGames extends BukkitRunnable implements Listener {
 
     // 0:30.0 Game Begins (300)
     // 0:40.0 Grace Period Over (400)
-    // 5:00.0 Chest Refill (3000)
+    // 7:00.0 Chest Refill (4200)
     // 9:00.0 Border Shrink to 100 (5400)
-    // 13:00.0 Border Shrink to 50 (7800)
-    // 16:00.0 Sudden Death (9600)
-    // 20:00.0 Game Over (12000)
+    // 12:00.0 Border Shrink to 50 (7200)
 
     private final MCTMain main;
 
@@ -49,6 +47,10 @@ public class HungerGames extends BukkitRunnable implements Listener {
         spawnLocations.add(world.getHighestBlockAt(-16, 0).getLocation().add(new Vector(0, 0, 0)));
         spawnLocations.add(world.getHighestBlockAt(0, 16).getLocation().add(new Vector(0, 0, 0)));
         spawnLocations.add(world.getHighestBlockAt(0, -16).getLocation().add(new Vector(0, 0, 0)));
+        spawnLocations.add(world.getHighestBlockAt(12, 12).getLocation().add(new Vector(0, 0, 0)));
+        spawnLocations.add(world.getHighestBlockAt(-12, -12).getLocation().add(new Vector(0, 0, 0)));
+        spawnLocations.add(world.getHighestBlockAt(-12, 12).getLocation().add(new Vector(0, 0, 0)));
+        spawnLocations.add(world.getHighestBlockAt(12, -12).getLocation().add(new Vector(0, 0, 0)));
 
         for (int i = 0; i < main.teamList.size(); i++) {
             ScoredTeam t = main.teamList.get(i);
@@ -104,7 +106,7 @@ public class HungerGames extends BukkitRunnable implements Listener {
 
         airdrop.getBlock().setType(Material.CHEST);
 
-        Chest chest = (Chest) airdrop.getBlock();
+        Chest chest = (Chest) airdrop.getBlock().getState();
 
         Inventory inv = chest.getInventory();
 
@@ -209,11 +211,13 @@ public class HungerGames extends BukkitRunnable implements Listener {
             }
         } else if (ticks == 400) {
             world.setPVP(true);
-        } else if (ticks == 3000) {
-            generateChestLoot(world);
-            main.broadcastTitle("Chests have been refilled!", (ChatColor.YELLOW), EnumTitleAction.SUBTITLE, 0, 20, 0);
+            main.broadcastTitle("PVP Enabled!", (ChatColor.RED), EnumTitleAction.SUBTITLE, 0, 20, 0);
             main.broadcastTitle("", ChatColor.WHITE, EnumTitleAction.TITLE, 0, 20, 0);
-        } else if (ticks == 3600) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                player.playSound(player.getLocation(), Sound.WITHER_DEATH, 1, 1);
+                player.setWalkSpeed(0.2f);
+            }
+        } else if (ticks == 3000) {
             int x = new Random().nextInt(360) - 180;
             int z = new Random().nextInt(360) - 180;
             while(distance(x,z,0,0) > 170) {
@@ -221,17 +225,53 @@ public class HungerGames extends BukkitRunnable implements Listener {
                 z = new Random().nextInt(360) - 180;
             }
             spawnAirdrop(x, z);
-
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                player.playSound(player.getLocation(), Sound.FIREWORK_LAUNCH, 1, 0);
+            }
+        } else if (ticks == 4200) {
+            generateChestLoot(world);
+            main.broadcastTitle("Chests have been refilled!", (ChatColor.YELLOW), EnumTitleAction.SUBTITLE, 10, 20, 10);
+            main.broadcastTitle("", ChatColor.WHITE, EnumTitleAction.TITLE, 10, 20, 10);
+            Bukkit.getServer().broadcastMessage(ChatColor.RED + "Chests " + ChatColor.YELLOW + "have been refilled!");
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                player.playSound(player.getLocation(), Sound.CHEST_CLOSE, 1, 1);
+            }
+        } else if (ticks == 5400) {
+            main.broadcastTitle("Get within +100, -100!", (ChatColor.DARK_RED), EnumTitleAction.SUBTITLE, 10, 20, 10);
+            main.broadcastTitle("! BORDER !", ChatColor.RED, EnumTitleAction.TITLE, 10, 20, 10);
+            Bukkit.getServer().broadcastMessage(ChatColor.RED + "Border is shrinking! Get within +100, -100");
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                player.playSound(player.getLocation(), Sound.WITHER_IDLE, 1, 0);
+            }
+            world.getWorldBorder().setSize(200, 30);
+        } else if (ticks == 6000) {
+            int x = new Random().nextInt(196) - 93;
+            int z = new Random().nextInt(196) - 93;
+            spawnAirdrop(x, z);
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                player.playSound(player.getLocation(), Sound.FIREWORK_LAUNCH, 1, 0);
+            }
+        } else if (ticks == 7200) {
+            main.broadcastTitle("Get within +25, -25", (ChatColor.DARK_RED), EnumTitleAction.SUBTITLE, 10, 20, 10);
+            main.broadcastTitle("! BORDER !", ChatColor.RED, EnumTitleAction.TITLE, 10, 20, 10);
+            Bukkit.getServer().broadcastMessage(ChatColor.RED + "Border is shrinking! Get within +25, -25");
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                player.playSound(player.getLocation(), Sound.WITHER_IDLE, 1, 0);
+            }
+            world.getWorldBorder().setSize(50, 30);
         }
 
+        // 0:30.0 Game Begins (300)
+        // 0:40.0 Grace Period Over (400)
+        // 5:00.0 Airdrop #1
+        // 7:00.0 Chest Refill (4200)
+        // 9:00.0 Border Shrink to 100 (5400)
+        // 10:00.0 Airdrop #2
+        // 12:00.0 Border Shrink to 50 (7200)
 
     }
 
-    public double distance(
-            double x1,
-            double y1,
-            double x2,
-            double y2) {
+    public double distance(double x1, double y1, double x2, double y2) {
         return Math.sqrt((y2 - y1) * (y2 - y1) + (x2 - x1) * (x2 - x1));
     }
 
@@ -241,7 +281,7 @@ public class HungerGames extends BukkitRunnable implements Listener {
         Objective obj = board.registerNewObjective(ChatColor.DARK_AQUA + (ChatColor.BOLD + "MCT #1"), "dummy");
         obj.setDisplaySlot(DisplaySlot.SIDEBAR);
 
-        Score gamePlaying = obj.getScore(ChatColor.AQUA + "Game » " + ChatColor.WHITE + "Hunger Games");
+        Score        gamePlaying = obj.getScore(ChatColor.AQUA + "Game » " + ChatColor.WHITE + "Hunger Games");
         gamePlaying.setScore(15);
 
         Team gameTimer = board.registerNewTeam("gameTimer");
@@ -250,40 +290,9 @@ public class HungerGames extends BukkitRunnable implements Listener {
 
         // 0:30.0 Game Begins (300)
         // 0:40.0 Grace Period Over (400)
-        // 5:00.0 Chest Refill (3000)
+        // 7:00.0 Chest Refill (4200)
         // 9:00.0 Border Shrink to 100 (5400)
-        // 13:00.0 Border Shrink to 50 (7800)
-        // 16:00.0 Sudden Death (9600)
-        // 20:00.0 Game Over (12000)
-
-
-        int ticksLeft = ticks;
-        String nextEvent = "";
-        if (ticks <= 300) {
-            ticksLeft -= 0;
-            nextEvent = "Game Start";
-        } else if (ticks <= 400) {
-            ticksLeft -= 300;
-            nextEvent = "Grace Over";
-        } else if (ticks <= 3000) {
-            ticksLeft -= 400;
-            nextEvent = "Chest Refill";
-        } else if (ticks <= 5400) {
-            ticksLeft -= 3000;
-            nextEvent = "Border (100)";
-        } else if (ticks <= 7800) {
-            ticksLeft -= 5400;
-            nextEvent = "Border (50)";
-        } else if (ticks <= 9600) {
-            ticksLeft -= 7800;
-            nextEvent = "Sudden Death";
-        } else if (ticks <= 12000) {
-            ticksLeft -= 9600;
-            nextEvent = "Game End";
-        }
-
-        String seconds = "" + (int) Math.floor((float) ticksLeft / 10) % 60;
-        String minutes = "" + (int) Math.floor((float) ticksLeft / 600);
+        // 12:00.0 Border Shrink to 50 (7200)
 
         gameTimer.setPrefix("n");
 
@@ -292,14 +301,14 @@ public class HungerGames extends BukkitRunnable implements Listener {
         Team playersLeft = board.registerNewTeam("playersLeft");
 
         playersLeft.addEntry(ChatColor.DARK_RED + "" + ChatColor.WHITE);
-        playersLeft.setPrefix("n");
+        playersLeft.setPrefix("SOMETHING IS");
 
         obj.getScore(ChatColor.DARK_RED + "" + ChatColor.WHITE).setScore(13);
 
         Team playerKillsS = board.registerNewTeam("playerKills");
 
         playerKillsS.addEntry(ChatColor.RED + "" + ChatColor.WHITE);
-        playerKillsS.setPrefix("n");
+        playerKillsS.setPrefix("BROKEN");
 
         obj.getScore(ChatColor.RED + "" + ChatColor.WHITE).setScore(12);
 
@@ -309,14 +318,14 @@ public class HungerGames extends BukkitRunnable implements Listener {
         Team playerScore = board.registerNewTeam("playerScore");
 
         playerScore.addEntry(ChatColor.GOLD + "" + ChatColor.WHITE);
-        playerScore.setPrefix("n");
+        playerScore.setPrefix("You are");
 
         obj.getScore(ChatColor.GOLD + "" + ChatColor.WHITE).setScore(10);
 
         Team teamScore = board.registerNewTeam("teamScore");
 
         teamScore.addEntry(ChatColor.YELLOW + "" + ChatColor.WHITE);
-        teamScore.setPrefix("n");
+        teamScore.setPrefix("an admin");
 
         obj.getScore(ChatColor.YELLOW + "" + ChatColor.WHITE).setScore(9);
 
@@ -329,28 +338,29 @@ public class HungerGames extends BukkitRunnable implements Listener {
 
         int ticksLeft = ticks;
         String nextEvent = "";
-
+        // 0:30.0 Game Begins (300)
+        // 0:40.0 Grace Period Over (400)
+        // 7:00.0 Chest Refill (4200)
+        // 9:00.0 Border Shrink to 100 (5400)
+        // 12:00.0 Border Shrink to 50 (7200)
         if (ticks <= 300) {
             nextEvent = "Game Start";
             ticksLeft -= 300;
         } else if (ticks <= 400) {
             ticksLeft -= 400;
             nextEvent = "Grace Over";
-        } else if (ticks <= 3000) {
-            ticksLeft -= 3000;
+        } else if (ticks <= 4200) {
+            ticksLeft -= 4200;
             nextEvent = "Chest Refill";
         } else if (ticks <= 5400) {
             ticksLeft -= 5400;
-            nextEvent = "Border (100)";
-        } else if (ticks <= 7800) {
-            ticksLeft -= 7800;
+            nextEvent = "Border (200)";
+        } else if (ticks <= 7200) {
+            ticksLeft -= 7200;
             nextEvent = "Border (50)";
-        } else if (ticks <= 9600) {
-            ticksLeft -= 9600;
-            nextEvent = "Sudden Death";
-        } else if (ticks <= 12000) {
-            ticksLeft -= 12000;
-            nextEvent = "Game End";
+        } else {
+            ticksLeft = 0;
+            nextEvent = "Final Fight!";
         }
 
         ticksLeft = Math.abs(ticksLeft);
@@ -358,8 +368,10 @@ public class HungerGames extends BukkitRunnable implements Listener {
         String seconds = "" + (int) Math.floor((float) ticksLeft / 10f) % 60;
         String minutes = "" + (int) Math.floor((float) ticksLeft / 600f);
 
-        if (seconds.length() == 1) {
-            seconds = "0" + seconds;
+        if(seconds != null) {
+            if (seconds.length() == 1) {
+                seconds = "0" + seconds;
+            }
         }
 
         String gameTimer = ChatColor.AQUA + nextEvent + " » " + minutes + ":" + seconds;
@@ -395,23 +407,24 @@ public class HungerGames extends BukkitRunnable implements Listener {
         } else {
             board.getTeam("playerKills").setPrefix(playerKillsS);
         }
+        if (!player.isOp()) {
+            String playerScore = ChatColor.RED + "Your Score »  " + main.getScoredPlayer(player).score;
 
-        String playerScore = ChatColor.RED + "Your Score »  " + main.getScoredPlayer(player).score;
+            if (playerScore.length() > 16) {
+                board.getTeam("playerScore").setPrefix(playerScore.substring(0, 16));
+                board.getTeam("playerScore").setSuffix(playerScore.substring(16));
+            } else {
+                board.getTeam("playerScore").setPrefix(playerScore);
+            }
 
-        if (playerScore.length() > 16) {
-            board.getTeam("playerScore").setPrefix(playerScore.substring(0, 16));
-            board.getTeam("playerScore").setSuffix(playerScore.substring(16));
-        } else {
-            board.getTeam("playerScore").setPrefix(playerScore);
-        }
+            String teamScore = ChatColor.RED + "Team Score »  " + main.getScoredPlayer(player).team.getScore();
 
-        String teamScore = ChatColor.RED + "Team Score »  " + main.getScoredPlayer(player).team.getScore();
-
-        if (teamScore.length() > 16) {
-            board.getTeam("teamScore").setPrefix(teamScore.substring(0, 16));
-            board.getTeam("teamScore").setSuffix(teamScore.substring(16));
-        } else {
-            board.getTeam("teamScore").setPrefix(teamScore);
+            if (teamScore.length() > 16) {
+                board.getTeam("teamScore").setPrefix(teamScore.substring(0, 16));
+                board.getTeam("teamScore").setSuffix(teamScore.substring(16));
+            } else {
+                board.getTeam("teamScore").setPrefix(teamScore);
+            }
         }
 
     }

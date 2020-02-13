@@ -22,8 +22,8 @@ HungerGames:
       - FLINT
       - FEATHER
       - LEATHER
-      - PAPER
       - GOLD_SWORD
+      - GOLD_INGOT
     Tier2:
       - STONE_SWORD
       - STONE_SWORD
@@ -113,3 +113,24 @@ HungerGames:
       - BOW
       - ARROW
       - ARROW
+DeathMessages:
+  - was destroyed by
+  - got rekt by
+  - was slain by
+  - got rolled by
+  - was killed by
+  - was memed by
+  - was called a nerd and couldn't handle the roast by
+  - was roasted by
+  - had their last stand against
+  - was worse at PVP than
+  - got pinged on discord by
+  - had their cubby cleaned by
+  - got cleaned by
+  - was afk, so they were rolled by
+  - sucks at pvp, so they got absolutely destroyed by
+  - was trying to win, but ultimately failed to
+  - <- is good | is bad ->
+  - got baked into a cake by
+  - was grilled and salted by
+  - had to go to an orthodontist appointment, and was killed by

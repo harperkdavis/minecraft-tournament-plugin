@@ -61,12 +61,12 @@ public class CommandHandler implements CommandExecutor {
                             ScoredTeam t = main.getScoredPlayer(player).team;
                             main.teamList.remove(t);
                             player.sendMessage(ChatColor.WHITE + "You have disbanded the team");
-                            t.player2.player.sendMessage(ChatColor.BLUE + player.getName() + ChatColor.WHITE + " has disbanded the team");
                             if(t.player1 != null) {
                                 t.player1.team = null;
                                 t.player1.player.setDisplayName(t.player1.player.getName());
                             }
                             if(t.player2 != null) {
+                                t.player2.player.sendMessage(ChatColor.BLUE + player.getName() + ChatColor.WHITE + " has disbanded the team");
                                 t.player2.team = null;
                                 t.player2.player.setDisplayName(t.player2.player.getName());
                             }
@@ -77,9 +77,13 @@ public class CommandHandler implements CommandExecutor {
                 if (args[0].equals("team")) { // team
                     if (args[1].equals("create")) { // create team
                         if (main.getScoredPlayer(player).team == null) {
-                            ScoredTeam team = new ScoredTeam(args[2], randomChatColor(), main.getScoredPlayer(player));
-                            main.teamList.add(team);
-                            Bukkit.getServer().broadcastMessage(ChatColor.BLUE + player.getDisplayName() + ChatColor.WHITE + " has created the team: " + team.col + team.teamName);
+                            if (args[2].length() <= 16) {
+                                ScoredTeam team = new ScoredTeam(args[2], randomChatColor(), main.getScoredPlayer(player));
+                                main.teamList.add(team);
+                                Bukkit.getServer().broadcastMessage(ChatColor.BLUE + player.getName() + ChatColor.WHITE + " has created the team: " + team.col + team.teamName);
+                            } else {
+                                player.sendMessage(ChatColor.RED + "That team name is too long! (> 16 characters)");
+                            }
                         } else {
                             player.sendMessage(ChatColor.RED + "You are already on a team! Leave with /mct team leave");
                         }
@@ -88,6 +92,7 @@ public class CommandHandler implements CommandExecutor {
                             Player p = Bukkit.getServer().getPlayer(args[2]);
                             if (p != null) {
                                 main.getScoredPlayer(player).team.setPlayer2(main.getScoredPlayer(p));
+                                player.sendMessage(ChatColor.BLUE + p.getName() + ChatColor.WHITE + " has been added to the team");
                                 p.sendMessage(ChatColor.GOLD + "You have been added to " + main.getScoredPlayer(player).team.col + main.getScoredPlayer(player).team.teamName);
                             } else {
                                 player.sendMessage(ChatColor.RED + "That player was not found!");
