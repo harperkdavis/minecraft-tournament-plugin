@@ -13,17 +13,17 @@ public class Manhunt extends BukkitRunnable {
 
     private int ticks = 0;
 
-    public Map<Player, Player> playerTargets= new HashMap<Player, Player>();
+    private Map<Player, Player> playerTargets= new HashMap<>();
     private MCTMain main;
 
     private World world;
 
-    public Manhunt(MCTMain main, World world) {
+    Manhunt(MCTMain main, World world) {
         this.main = main;
         this.world = world;
         main.tasksRunning.add(this);
         // Pick List
-        Boolean targets = false;
+        boolean targets = false;
         List<ScoredPlayer> players = main.getAllCompetitors();
         while(!targets) {
             Bukkit.getServer().broadcastMessage("while loop");
@@ -85,7 +85,7 @@ public class Manhunt extends BukkitRunnable {
         if (ticks % 600 == 0) {
             for (ScoredPlayer p : main.getAllCompetitors()) {
                 if (p.player.getGameMode() == GameMode.SURVIVAL) {
-                    p.addScore((int) ticks / 1200 + 1, "surviving");
+                    p.addScore(ticks / 1200 + 1, "surviving");
                 }
             }
         }
@@ -94,7 +94,7 @@ public class Manhunt extends BukkitRunnable {
         }
     }
 
-    public void registerKill(Player killer, Player killed) {
+    void registerKill(Player killer, Player killed) {
         ScoredPlayer scoredKiller = main.getScoredPlayer(killer);
         if (playerTargets.get(killer) == killed) {
             scoredKiller.addScore(15, "killed target");
@@ -106,7 +106,7 @@ public class Manhunt extends BukkitRunnable {
         }
     }
 
-    public void setScoreBoard(Player player) {
+    private void setScoreBoard(Player player) {
 
         Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
         Objective obj = board.registerNewObjective(ChatColor.DARK_AQUA + (ChatColor.BOLD + "MCT #1"), "dummy");
@@ -166,7 +166,7 @@ public class Manhunt extends BukkitRunnable {
         player.setScoreboard(board);
     }
 
-    public void updateScoreboard(Player player) {
+    private void updateScoreboard(Player player) {
         if(player.getWorld() != world) {
             return;
         }

@@ -5,8 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.bukkit.*;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
@@ -30,12 +28,12 @@ public class HungerGames extends BukkitRunnable implements Listener {
 
     private final MCTMain main;
 
-    private int ticks = 0; // decaseconds
+    private int ticks = 0; // deca seconds
 
-    public Map<Player, Integer> playerKills = new HashMap<Player, Integer>();
-    public World world;
+    private Map<Player, Integer> playerKills = new HashMap<>();
+    private World world;
 
-    public HungerGames(MCTMain main, Player sender) {
+    HungerGames(MCTMain main, Player sender) {
         world = sender.getWorld();
 
         this.main = main;
@@ -46,7 +44,7 @@ public class HungerGames extends BukkitRunnable implements Listener {
         World world = sender.getWorld();
         world.getWorldBorder().setSize(400);
 
-        List<Location> spawnLocations = new ArrayList<Location>();
+        List<Location> spawnLocations = new ArrayList<>();
         spawnLocations.add(world.getHighestBlockAt(16, 0).getLocation().add(new Vector(0, 0, 0)));
         spawnLocations.add(world.getHighestBlockAt(-16, 0).getLocation().add(new Vector(0, 0, 0)));
         spawnLocations.add(world.getHighestBlockAt(0, 16).getLocation().add(new Vector(0, 0, 0)));
@@ -99,7 +97,7 @@ public class HungerGames extends BukkitRunnable implements Listener {
         }
     }
 
-    public void spawnAirdrop(int x, int z) {
+    private void spawnAirdrop(int x, int z) {
 
         Location airdrop = world.getHighestBlockAt(x, z).getLocation().add(new Vector(0, 2, 0));
 
@@ -116,16 +114,12 @@ public class HungerGames extends BukkitRunnable implements Listener {
 
         inv.clear();
 
-        List<String> lootTable = main.getConfig().getConfigurationSection("HungerGames").getConfigurationSection("Tables").getStringList("Airdrop");;
+        List<String> lootTable = main.getConfig().getConfigurationSection("HungerGames").getConfigurationSection("Tables").getStringList("Airdrop");
 
         for (int i = 0; i < 27; i++) {
 
             int index = new Random().nextInt(lootTable.size());
             String items = lootTable.get(index);
-
-            if (Material.getMaterial(items.toUpperCase()) == null) {
-                //Bukkit.getServer().broadcastMessage(ChatColor.BLUE+"The Culprit is: " + items);
-            }
 
             ItemStack newItem;
 
@@ -154,6 +148,7 @@ public class HungerGames extends BukkitRunnable implements Listener {
         for (ScoredPlayer p : main.playerList) {
             updateScoreboard(p.player);
         }
+        endGame();
 
         if (ticks == 1) {
             main.broadcastTitle("WEEK #1", (ChatColor.YELLOW), EnumTitleAction.SUBTITLE, 20, 40, 20);
@@ -224,7 +219,7 @@ public class HungerGames extends BukkitRunnable implements Listener {
         } else if (ticks == 3000) {
             int x = new Random().nextInt(360) - 180;
             int z = new Random().nextInt(360) - 180;
-            while(distance(x,z,0,0) > 170) {
+            while(distance(x,z) > 170) {
                 x = new Random().nextInt(360) - 180;
                 z = new Random().nextInt(360) - 180;
             }
@@ -275,11 +270,11 @@ public class HungerGames extends BukkitRunnable implements Listener {
 
     }
 
-    public double distance(double x1, double y1, double x2, double y2) {
-        return Math.sqrt((y2 - y1) * (y2 - y1) + (x2 - x1) * (x2 - x1));
+    private double distance(double x1, double y1) {
+        return Math.sqrt(((double) 0 - y1) * ((double) 0 - y1) + ((double) 0 - x1) * ((double) 0 - x1));
     }
 
-    public void setScoreBoard(Player player) {
+    private void setScoreBoard(Player player) {
 
         Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
         Objective obj = board.registerNewObjective(ChatColor.DARK_AQUA + (ChatColor.BOLD + "MCT #1"), "dummy");
@@ -349,14 +344,14 @@ public class HungerGames extends BukkitRunnable implements Listener {
         player.setScoreboard(board);
     }
 
-    public void updateScoreboard(Player player) {
+    private void updateScoreboard(Player player) {
         if(player.getWorld() != world) {
             return;
         }
         Scoreboard board = player.getScoreboard();
 
         int ticksLeft = ticks;
-        String nextEvent = "";
+        String nextEvent;
         // 0:30.0 Game Begins (300)
         // 0:40.0 Grace Period Over (400)
         // 7:00.0 Chest Refill (4200)
@@ -388,10 +383,8 @@ public class HungerGames extends BukkitRunnable implements Listener {
         String seconds = "" + (int) Math.floor((float) ticksLeft / 10f) % 60;
         String minutes = "" + (int) Math.floor((float) ticksLeft / 600f);
 
-        if(seconds != null) {
-            if (seconds.length() == 1) {
-                seconds = "0" + seconds;
-            }
+        if (seconds.length() == 1) {
+            seconds = "0" + seconds;
         }
 
         String gameTimer = ChatColor.AQUA + nextEvent + " » " + minutes + ":" + seconds;
@@ -454,7 +447,7 @@ public class HungerGames extends BukkitRunnable implements Listener {
     }
 
 
-    public void registerKill(Player killer, Player killed) {
+    void registerKill(Player killer) {
         playerKills.put(killer, playerKills.get(killer) + 1);
         ScoredPlayer scoredKiller = main.getScoredPlayer(killer);
         scoredKiller.addScore(15, "kill");
@@ -485,7 +478,7 @@ public class HungerGames extends BukkitRunnable implements Listener {
         }
     }
 
-    public void generateChestLoot(World world) {
+    private void generateChestLoot(World world) {
 
         List<String> tier1Loot = main.getConfig().getConfigurationSection("HungerGames").getConfigurationSection("Tables").getStringList("Tier1");
         List<String> tier2Loot = main.getConfig().getConfigurationSection("HungerGames").getConfigurationSection("Tables").getStringList("Tier2");
@@ -496,22 +489,10 @@ public class HungerGames extends BukkitRunnable implements Listener {
 
         //Bukkit.getServer().broadcastMessage(ChatColor.GRAY+player.getName());
 
-        int t1c = 0;
-        int t2c = 0;
-        int t3c = 0;
-
-        int apples = 0;
-        int iron = 0;
-        int gold = 0;
-        int diamond = 0;
-
         for (int x = -15; x <= 15; x++) {
             for (int z = -15; z <= 15; z++) {
 
                 Chunk c = world.getChunkAt(x, z);
-
-                String chp = ("Loaded Chunk: " + c.getX() + "," + c.getZ());
-                //Bukkit.getServer().broadcastMessage(ChatColor.GRAY+chp);
 
                 for (BlockState b : c.getTileEntities()) {
 
@@ -524,30 +505,20 @@ public class HungerGames extends BukkitRunnable implements Listener {
 
                         List<String> lootTable;
 
-                        String chsp = ("Found A Chest At: " + chest.getX() + "," + chest.getY() + "," + chest.getZ());
-                        //Bukkit.getServer().broadcastMessage(ChatColor.GOLD+chsp);
-
-                        String lt = ("This Chest's Name is: " + inv.getTitle());
-
-                        //Bukkit.getServer().broadcastMessage(ChatColor.AQUA+lt);
-
                         double chanceSpawn;
 
                         switch (inv.getTitle()) {
                             case "Tier 1":
                                 lootTable = tier1Loot;
                                 chanceSpawn = 0.15;
-                                t1c++;
                                 break;
                             case "Tier 2":
                                 lootTable = tier2Loot;
                                 chanceSpawn = 0.15;
-                                t2c++;
                                 break;
                             case "Tier 3":
                                 lootTable = tier3Loot;
                                 chanceSpawn = 0.12;
-                                t3c++;
                                 break;
                             case "Mid Chest":
                                 lootTable = midLoot;
@@ -565,10 +536,6 @@ public class HungerGames extends BukkitRunnable implements Listener {
                             int index = new Random().nextInt(lootTable.size());
                             String items = lootTable.get(index);
 
-                            if (Material.getMaterial(items.toUpperCase()) == null) {
-                                //Bukkit.getServer().broadcastMessage(ChatColor.BLUE+"The Culprit is: " + items);
-                            }
-
                             ItemStack newItem;
 
                             if (Material.getMaterial(items.toUpperCase()) == Material.ARROW || Material.getMaterial(items.toUpperCase()) == Material.COAL) {
@@ -577,16 +544,6 @@ public class HungerGames extends BukkitRunnable implements Listener {
                                 newItem = new ItemStack(Material.getMaterial(items.toUpperCase()), 16);
                             } else {
                                 newItem = new ItemStack(Material.getMaterial(items.toUpperCase()));
-                            }
-
-                            if (newItem.getType() == Material.APPLE) {
-                                apples++;
-                            } else if (newItem.getType() == Material.IRON_INGOT) {
-                                iron++;
-                            } else if (newItem.getType() == Material.GOLD_INGOT) {
-                                gold++;
-                            } else if (newItem.getType() == Material.DIAMOND) {
-                                diamond++;
                             }
 
                             if (Math.random() < chanceSpawn) {

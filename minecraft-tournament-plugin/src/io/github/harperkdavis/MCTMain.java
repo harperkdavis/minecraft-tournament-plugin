@@ -7,7 +7,6 @@ import net.minecraft.server.v1_8_R1.PacketPlayOutTitle;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
-import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_8_R1.entity.CraftPlayer;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -15,28 +14,19 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.scoreboard.Team;
-
-import javax.xml.bind.Marshaller;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class MCTMain extends JavaPlugin implements Listener {
 
-    public List<ScoredPlayer> playerList = new ArrayList<ScoredPlayer>();
-    public List<ScoredTeam> teamList = new ArrayList<ScoredTeam>();
+    List<ScoredPlayer> playerList = new ArrayList<>();
+    List<ScoredTeam> teamList = new ArrayList<>();
 
-    public List<BukkitRunnable> tasksRunning = new ArrayList<BukkitRunnable>();
+    List<BukkitRunnable> tasksRunning = new ArrayList<>();
 
     Boolean allowBlockChanging = false;
 
@@ -47,11 +37,8 @@ public class MCTMain extends JavaPlugin implements Listener {
         this.getCommand("mct").setExecutor(new CommandHandler(this));
         Bukkit.getServer().getPluginManager().registerEvents(this,this);
 
-        // Bukkit.getServer().getConsoleSender().sendMessage("Players in list:"+playerList.size());
-
         deathMessages = getConfig().getStringList("DeathMessages");
-        BukkitTask task = new LobbyScoreboard(this).runTaskTimer(this, 0, 2);
-        //tasksRunning.add(task);
+        new LobbyScoreboard(this).runTaskTimer(this, 0, 2);
 
         for (Player p: Bukkit.getOnlinePlayers()) {
             ScoredPlayer player = new ScoredPlayer(p, (p.isOp()));
@@ -74,7 +61,7 @@ public class MCTMain extends JavaPlugin implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         event.setJoinMessage(ChatColor.RED + event.getPlayer().getDisplayName() + ChatColor.GRAY + " has joined the Tournament");
 
-        Boolean isAdmin = event.getPlayer().isOp(); //event.getPlayer().getName() == "not_fyyre";
+        Boolean isAdmin = event.getPlayer().isOp();
 
         if (isAdmin) {
             Bukkit.getServer().broadcastMessage(ChatColor.DARK_GRAY + "Watch out, an Admin is approaching!");
@@ -106,7 +93,7 @@ public class MCTMain extends JavaPlugin implements Listener {
         }
     }
 
-    public void broadcastTitle(String text, ChatColor col, EnumTitleAction e, int i, int i1, int i2) {
+    void broadcastTitle(String text, ChatColor col, EnumTitleAction e, int i, int i1, int i2) {
         for (Player p : Bukkit.getOnlinePlayers()) {
             IChatBaseComponent chatTitle = ChatSerializer.a("{\"text\": \"" + text + "\",color:" + col.name().toLowerCase() + "}");
 
@@ -133,7 +120,7 @@ public class MCTMain extends JavaPlugin implements Listener {
         for (BukkitRunnable r : tasksRunning) {
             if (r instanceof HungerGames) {
                 HungerGames hg = (HungerGames) r;
-                hg.registerKill(killer, killed);
+                hg.registerKill(killer);
 
             }
             if (r instanceof Manhunt) {
@@ -165,7 +152,7 @@ public class MCTMain extends JavaPlugin implements Listener {
 
     }
 
-    public ScoredPlayer getScoredPlayer(Player d) {
+    ScoredPlayer getScoredPlayer(Player d) {
         // Bukkit.getServer().broadcastMessage(ChatColor.GOLD + "Searching through players");
         for (ScoredPlayer p : playerList) {
             // Bukkit.getServer().broadcastMessage(ChatColor.GRAY + "P: " + p);
@@ -179,30 +166,14 @@ public class MCTMain extends JavaPlugin implements Listener {
         return p;
     }
 
-    public List<ScoredPlayer> getAllCompetitors() {
-        List<ScoredPlayer> sp = new ArrayList<ScoredPlayer>();
+    List<ScoredPlayer> getAllCompetitors() {
+        List<ScoredPlayer> sp = new ArrayList<>();
         for (ScoredPlayer p : playerList) {
             if (!p.admin)
                 sp.add(p);
         }
 
         return sp;
-    }
-
-    public void ChangeWorldEvent(PlayerChangedWorldEvent event) {
-
-        Player player = (Player) event.getPlayer();
-        World world = player.getWorld();
-
-        if ((world.getName().equals("world"))){
-            for (BukkitRunnable r : tasksRunning) {
-                if (r instanceof HungerGames) {
-                    LobbyScoreboard ls = (LobbyScoreboard) r;
-                    ls.setScoreBoard(player);
-                }
-            }
-        }
-
     }
 
 }

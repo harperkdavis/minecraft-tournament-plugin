@@ -2,22 +2,10 @@ package io.github.harperkdavis;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Chunk;
-import org.bukkit.Material;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.Chest;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Item;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitTask;
-
-import java.util.List;
-import java.util.Random;
 
 public class CommandHandler implements CommandExecutor {
 
@@ -51,10 +39,10 @@ public class CommandHandler implements CommandExecutor {
                 if (args[0].equals("start")) {
                     if(args[1].equals("sg")) { //start survival games
                         player.sendMessage(ChatColor.WHITE + "Starting survival games!");
-                        BukkitTask task = new HungerGames(main, player).runTaskTimer(main, 5, 2);
+                        new HungerGames(main, player).runTaskTimer(main, 5, 2);
                     } else if(args[1].equals("mh")) { //start survival games
                         player.sendMessage(ChatColor.WHITE + "Starting the Hunt!");
-                        BukkitTask task = new Manhunt(main, player.getWorld()).runTaskTimer(main, 5, 2);
+                        new Manhunt(main, player.getWorld()).runTaskTimer(main, 5, 2);
                     }
                 } else if (args[0].equals("team")) {
                     if (args[1].equals("leave")) {
@@ -113,7 +101,7 @@ public class CommandHandler implements CommandExecutor {
         return true;
     }
 
-    ChatColor randomChatColor() {
+    private ChatColor randomChatColor() {
         int color = (int)Math.floor(Math.random() * 11);
 
         switch (color) {
@@ -145,7 +133,7 @@ public class CommandHandler implements CommandExecutor {
         }
     }
 
-    public void displayHelp(CommandSender sender) {
+    private void displayHelp(CommandSender sender) {
         sender.sendMessage(ChatColor.AQUA + "======= Minecraft Tournament Help =======");
         sender.sendMessage(ChatColor.WHITE+ "/mct - the main base command");
         sender.sendMessage(ChatColor.WHITE+ "/mct start <game> - start game");

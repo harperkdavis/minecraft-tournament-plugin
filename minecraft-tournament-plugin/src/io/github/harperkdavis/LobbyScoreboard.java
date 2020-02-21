@@ -6,7 +6,6 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.*;
 import org.bukkit.util.Vector;
@@ -21,7 +20,7 @@ public class LobbyScoreboard extends BukkitRunnable {
     private final MCTMain main;
     private int ticks = 0;
 
-    public LobbyScoreboard(MCTMain main) {
+    LobbyScoreboard(MCTMain main) {
         this.main = main;
         main.tasksRunning.add(this);
 
@@ -33,7 +32,7 @@ public class LobbyScoreboard extends BukkitRunnable {
 
     }
 
-    public void updateTopList() {
+    private void updateTopList() {
         World world = Bukkit.getServer().getWorld("world");
         for (Entity e : world.getEntities()) {
             if (e instanceof ArmorStand) {
@@ -45,7 +44,7 @@ public class LobbyScoreboard extends BukkitRunnable {
 
         Vector h = new Vector(0, 0, 0);
 
-        List<ScoredTeam> sortedTeamList = new ArrayList<ScoredTeam>();
+        List<ScoredTeam> sortedTeamList = new ArrayList<>();
         int[] teamScores = new int[main.teamList.size()];
 
         for (int i = 0; i < teamScores.length; i++) {
@@ -77,11 +76,11 @@ public class LobbyScoreboard extends BukkitRunnable {
         topTeamLDB.setCustomName(ChatColor.BOLD + (ChatColor.GREEN + " Team List"));
         topTeamLDB.setGravity(false);
 
-        Location plyldb = new Location(world, 10.5, 66.5, 51.5);
+        Location phyla = new Location(world, 10.5, 66.5, 51.5);
 
         Vector h2 = new Vector(0, 0, 0);
 
-        List<ScoredPlayer> sortedPlayerList = new ArrayList<ScoredPlayer>();
+        List<ScoredPlayer> sortedPlayerList = new ArrayList<>();
         int[] playerScores = new int[main.getAllCompetitors().size()];
 
         for (int i = 0; i < playerScores.length; i++) {
@@ -99,7 +98,7 @@ public class LobbyScoreboard extends BukkitRunnable {
         }
 
         for (ScoredPlayer sp : sortedPlayerList) {
-            ArmorStand as = (ArmorStand) world.spawnEntity(plyldb.add(h2), EntityType.ARMOR_STAND);
+            ArmorStand as = (ArmorStand) world.spawnEntity(phyla.add(h2), EntityType.ARMOR_STAND);
             as.setVisible(false);
             as.setCustomNameVisible(true);
             if (sp.team != null) {
@@ -111,7 +110,7 @@ public class LobbyScoreboard extends BukkitRunnable {
             h2.add(new Vector(0, 0.3, 0));
         }
 
-        ArmorStand topPlayerLDB = (ArmorStand) world.spawnEntity(plyldb.add(h2), EntityType.ARMOR_STAND);
+        ArmorStand topPlayerLDB = (ArmorStand) world.spawnEntity(phyla.add(h2), EntityType.ARMOR_STAND);
         topPlayerLDB.setVisible(false);
         topPlayerLDB.setCustomNameVisible(true);
         topPlayerLDB.setCustomName(ChatColor.BOLD + (ChatColor.GREEN + " Player List"));
@@ -138,7 +137,7 @@ public class LobbyScoreboard extends BukkitRunnable {
         }
     }
 
-    public void setScoreBoard(Player player) {
+    private void setScoreBoard(Player player) {
 
         Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
         Objective obj = board.registerNewObjective(ChatColor.DARK_AQUA + (ChatColor.BOLD + "MCT #1"), "dummy");
@@ -181,7 +180,7 @@ public class LobbyScoreboard extends BukkitRunnable {
         player.setScoreboard(board);
     }
 
-    public void updateScoreboard(Player player) {
+    private void updateScoreboard(Player player) {
 
         Scoreboard board = player.getScoreboard();
 
