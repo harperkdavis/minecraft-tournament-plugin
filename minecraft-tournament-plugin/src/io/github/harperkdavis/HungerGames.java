@@ -1,9 +1,12 @@
 package io.github.harperkdavis;
 
 import net.minecraft.server.v1_8_R1.EnumTitleAction;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.*;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
@@ -38,6 +41,7 @@ public class HungerGames extends BukkitRunnable implements Listener {
         this.main = main;
         main.tasksRunning.add(this);
         generateChestLoot(sender.getWorld());
+        main.allowBlockChanging = false;
         // Initial
         World world = sender.getWorld();
         world.getWorldBorder().setSize(400);
@@ -83,15 +87,15 @@ public class HungerGames extends BukkitRunnable implements Listener {
 
     private void setBarriers(Location loc, Boolean setBarrier) {
         if (setBarrier) {
-            world.getBlockAt(loc.add(new Vector(1, 0, 0))).setType(Material.BARRIER);
-            world.getBlockAt(loc.add(new Vector(0, 0, 1))).setType(Material.BARRIER);
-            world.getBlockAt(loc.add(new Vector(-1, 0, 0))).setType(Material.BARRIER);
-            world.getBlockAt(loc.add(new Vector(0, 0, -1))).setType(Material.BARRIER);
+            world.getBlockAt(loc.add(new Vector(0.5, 0, 0))).setType(Material.BARRIER);
+            world.getBlockAt(loc.add(new Vector(0, 0, 0.5))).setType(Material.BARRIER);
+            world.getBlockAt(loc.add(new Vector(-1.5, 0, 0))).setType(Material.BARRIER);
+            world.getBlockAt(loc.add(new Vector(0, 0, -1.5))).setType(Material.BARRIER);
         } else {
-            world.getBlockAt(loc.add(new Vector(1, 0, 0))).setType(Material.AIR);
-            world.getBlockAt(loc.add(new Vector(0, 0, 1))).setType(Material.AIR);
-            world.getBlockAt(loc.add(new Vector(-1, 0, 0))).setType(Material.AIR);
-            world.getBlockAt(loc.add(new Vector(0, 0, -1))).setType(Material.AIR);
+            world.getBlockAt(loc.add(new Vector(0.5, 0, 0))).setType(Material.AIR);
+            world.getBlockAt(loc.add(new Vector(0, 0, 0.5))).setType(Material.AIR);
+            world.getBlockAt(loc.add(new Vector(-1.5, 0, 0))).setType(Material.AIR);
+            world.getBlockAt(loc.add(new Vector(0, 0, -1.5))).setType(Material.AIR);
         }
     }
 
@@ -281,8 +285,11 @@ public class HungerGames extends BukkitRunnable implements Listener {
         Objective obj = board.registerNewObjective(ChatColor.DARK_AQUA + (ChatColor.BOLD + "MCT #1"), "dummy");
         obj.setDisplaySlot(DisplaySlot.SIDEBAR);
 
-        Score        gamePlaying = obj.getScore(ChatColor.AQUA + "Game » " + ChatColor.WHITE + "Hunger Games");
-        gamePlaying.setScore(15);
+        Score line1 = obj.getScore(ChatColor.STRIKETHROUGH + StringUtils.repeat(" ", 36) + ChatColor.BLUE);
+        line1.setScore(15);
+
+        Score gamePlaying = obj.getScore(ChatColor.AQUA + "Game » " + ChatColor.WHITE + "Hunger Games");
+        gamePlaying.setScore(14);
 
         Team gameTimer = board.registerNewTeam("gameTimer");
 
@@ -296,44 +303,56 @@ public class HungerGames extends BukkitRunnable implements Listener {
 
         gameTimer.setPrefix("n");
 
-        obj.getScore(ChatColor.BLACK + "" + ChatColor.WHITE).setScore(14);
+
+        obj.getScore(ChatColor.BLACK + "" + ChatColor.WHITE).setScore(13);
+
+        Score space1 = obj.getScore(ChatColor.GRAY + " ");
+        space1.setScore(12);
 
         Team playersLeft = board.registerNewTeam("playersLeft");
 
         playersLeft.addEntry(ChatColor.DARK_RED + "" + ChatColor.WHITE);
         playersLeft.setPrefix("SOMETHING IS");
 
-        obj.getScore(ChatColor.DARK_RED + "" + ChatColor.WHITE).setScore(13);
+        obj.getScore(ChatColor.DARK_RED + "" + ChatColor.WHITE).setScore(11);
 
         Team playerKillsS = board.registerNewTeam("playerKills");
 
         playerKillsS.addEntry(ChatColor.RED + "" + ChatColor.WHITE);
         playerKillsS.setPrefix("BROKEN");
 
-        obj.getScore(ChatColor.RED + "" + ChatColor.WHITE).setScore(12);
+        obj.getScore(ChatColor.RED + "" + ChatColor.WHITE).setScore(10);
 
-        Score space = obj.getScore(ChatColor.GRAY + " ");
-        space.setScore(11);
+        Score line2 = obj.getScore(ChatColor.STRIKETHROUGH + StringUtils.repeat(" ", 36) + ChatColor.RED);
+        line2.setScore(9);
 
         Team playerScore = board.registerNewTeam("playerScore");
 
         playerScore.addEntry(ChatColor.GOLD + "" + ChatColor.WHITE);
         playerScore.setPrefix("You are");
 
-        obj.getScore(ChatColor.GOLD + "" + ChatColor.WHITE).setScore(10);
+        obj.getScore(ChatColor.GOLD + "" + ChatColor.WHITE).setScore(8);
 
         Team teamScore = board.registerNewTeam("teamScore");
 
         teamScore.addEntry(ChatColor.YELLOW + "" + ChatColor.WHITE);
         teamScore.setPrefix("an admin");
 
-        obj.getScore(ChatColor.YELLOW + "" + ChatColor.WHITE).setScore(9);
+        obj.getScore(ChatColor.YELLOW + "" + ChatColor.WHITE).setScore(7);
+
+        Score line3 = obj.getScore(ChatColor.STRIKETHROUGH + StringUtils.repeat(" ", 36) + ChatColor.LIGHT_PURPLE);
+        line3.setScore(6);
+
+        Score name = obj.getScore(ChatColor.DARK_GRAY + player.getName());
+        name.setScore(5);
 
         player.setScoreboard(board);
     }
 
     public void updateScoreboard(Player player) {
-
+        if(player.getWorld() != world) {
+            return;
+        }
         Scoreboard board = player.getScoreboard();
 
         int ticksLeft = ticks;
@@ -364,6 +383,7 @@ public class HungerGames extends BukkitRunnable implements Listener {
         }
 
         ticksLeft = Math.abs(ticksLeft);
+        ticksLeft += 20;
 
         String seconds = "" + (int) Math.floor((float) ticksLeft / 10f) % 60;
         String minutes = "" + (int) Math.floor((float) ticksLeft / 600f);
@@ -375,6 +395,10 @@ public class HungerGames extends BukkitRunnable implements Listener {
         }
 
         String gameTimer = ChatColor.AQUA + nextEvent + " » " + minutes + ":" + seconds;
+        if (board.getTeam("gameTimer") == null) {
+            setScoreBoard(player);
+            return;
+        }
 
         if (gameTimer.length() > 16) {
             board.getTeam("gameTimer").setPrefix(gameTimer.substring(0, 16));
@@ -441,9 +465,27 @@ public class HungerGames extends BukkitRunnable implements Listener {
         }
     }
 
-    public void generateChestLoot(World world) {
+    private void endGame() {
 
-        Bukkit.getServer().broadcastMessage(ChatColor.BLUE + "Generating Chests...");
+        List<ScoredTeam> teamsAlive = new ArrayList<>();
+        for (ScoredPlayer p : main.getAllCompetitors()) {
+            if (p.player.getGameMode() == GameMode.SURVIVAL) {
+                if (!teamsAlive.contains(p.team)) {
+                    teamsAlive.add(p.team);
+                }
+            }
+        }
+        if (teamsAlive.size() == 1) {
+            main.broadcastTitle(teamsAlive.get(0).teamName + " wins!", (ChatColor.GRAY), EnumTitleAction.SUBTITLE, 10, 20, 10);
+            main.broadcastTitle("VICTORY!", ChatColor.GOLD, EnumTitleAction.TITLE, 10, 20, 10);
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                player.playSound(player.getLocation(), Sound.LEVEL_UP, 1, 1);
+            }
+            this.cancel();
+        }
+    }
+
+    public void generateChestLoot(World world) {
 
         List<String> tier1Loot = main.getConfig().getConfigurationSection("HungerGames").getConfigurationSection("Tables").getStringList("Tier1");
         List<String> tier2Loot = main.getConfig().getConfigurationSection("HungerGames").getConfigurationSection("Tables").getStringList("Tier2");
@@ -504,7 +546,7 @@ public class HungerGames extends BukkitRunnable implements Listener {
                                 break;
                             case "Tier 3":
                                 lootTable = tier3Loot;
-                                chanceSpawn = 0.08;
+                                chanceSpawn = 0.12;
                                 t3c++;
                                 break;
                             case "Mid Chest":
@@ -559,16 +601,6 @@ public class HungerGames extends BukkitRunnable implements Listener {
             }
 
         }
-
-        Bukkit.getServer().broadcastMessage(ChatColor.BLUE + "Finished Generating Chests!");
-        Bukkit.getServer().broadcastMessage(ChatColor.DARK_PURPLE + "Tier 1: " + ChatColor.WHITE + ChatColor.BOLD + t1c);
-        Bukkit.getServer().broadcastMessage(ChatColor.DARK_PURPLE + "Tier 2: " + ChatColor.WHITE + ChatColor.BOLD + t2c);
-        Bukkit.getServer().broadcastMessage(ChatColor.DARK_PURPLE + "Tier 3: " + ChatColor.WHITE + ChatColor.BOLD + t3c);
-
-        Bukkit.getServer().broadcastMessage(ChatColor.DARK_PURPLE + "Apples " + ChatColor.WHITE + ChatColor.BOLD + apples);
-        Bukkit.getServer().broadcastMessage(ChatColor.DARK_PURPLE + "Iron " + ChatColor.WHITE + ChatColor.BOLD + iron);
-        Bukkit.getServer().broadcastMessage(ChatColor.DARK_PURPLE + "Gold " + ChatColor.WHITE + ChatColor.BOLD + gold);
-        Bukkit.getServer().broadcastMessage(ChatColor.DARK_PURPLE + "Diamond " + ChatColor.WHITE + ChatColor.BOLD + diamond);
 
     }
 

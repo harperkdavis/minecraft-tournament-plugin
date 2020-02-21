@@ -38,7 +38,7 @@ public class MCTMain extends JavaPlugin implements Listener {
 
     public List<BukkitRunnable> tasksRunning = new ArrayList<BukkitRunnable>();
 
-    Boolean allowBlockPlacing = false;
+    Boolean allowBlockChanging = false;
 
     private List<String> deathMessages;
 
@@ -92,7 +92,7 @@ public class MCTMain extends JavaPlugin implements Listener {
     public void blockPlacing(BlockPlaceEvent event) {
         Player player = event.getPlayer();
 
-        if (!player.isOp()) {
+        if (!player.isOp() && !allowBlockChanging) {
             event.setCancelled(true);
         }
     }
@@ -101,7 +101,7 @@ public class MCTMain extends JavaPlugin implements Listener {
     public void blockBreaking(BlockBreakEvent event) {
         Player player = event.getPlayer();
 
-        if (!player.isOp()) {
+        if (!player.isOp() && !allowBlockChanging) {
             event.setCancelled(true);
         }
     }
@@ -122,25 +122,30 @@ public class MCTMain extends JavaPlugin implements Listener {
     }
 
     @EventHandler
-    public void onKill(PlayerDeathEvent e) {
+    public void onDeath(PlayerDeathEvent e) {
 
-        Player killed = (Player)e.getEntity();
-        Player killer = (Player)e.getEntity().getKiller();
+        Player killed = e.getEntity();
+        Player killer = e.getEntity().getKiller();
 
         killer.getWorld().strikeLightningEffect(killer.getLocation());
-
-        String message = deathMessages.get((int)Math.floor(Math.random() * deathMessages.size()));
-
-        e.setDeathMessage(ChatColor.RED + killed.getName() + " " + message + " " + killer.getName() + ChatColor.GRAY + " (" + ChatColor.YELLOW + killer.getHealth() + ChatColor.RED + "❤" + ChatColor.GRAY + ")");
-
+        String killerName = killer.getName();
 
         for (BukkitRunnable r : tasksRunning) {
             if (r instanceof HungerGames) {
-                HungerGames hg = (HungerGames)r;
+                HungerGames hg = (HungerGames) r;
                 hg.registerKill(killer, killed);
 
             }
+            if (r instanceof Manhunt) {
+                Manhunt mh = (Manhunt) r;
+                mh.registerKill(killer, killed);
+            }
         }
+
+
+        String message = deathMessages.get((int)Math.floor(Math.random() * deathMessages.size()));
+
+        e.setDeathMessage(ChatColor.RED + killed.getName() + " " + message + " " + killerName + ChatColor.GRAY + " (" + ChatColor.YELLOW + killer.getHealth() + ChatColor.RED + "❤" + ChatColor.GRAY + ")");
 
         killed.setGameMode(GameMode.SPECTATOR);
         getScoredPlayer(killed).broadcastTitle("You Died!", ChatColor.RED, EnumTitleAction.SUBTITLE, 5, 40, 5);

@@ -52,6 +52,9 @@ public class CommandHandler implements CommandExecutor {
                     if(args[1].equals("sg")) { //start survival games
                         player.sendMessage(ChatColor.WHITE + "Starting survival games!");
                         BukkitTask task = new HungerGames(main, player).runTaskTimer(main, 5, 2);
+                    } else if(args[1].equals("mh")) { //start survival games
+                        player.sendMessage(ChatColor.WHITE + "Starting the Hunt!");
+                        BukkitTask task = new Manhunt(main, player.getWorld()).runTaskTimer(main, 5, 2);
                     }
                 } else if (args[0].equals("team")) {
                     if (args[1].equals("leave")) {
